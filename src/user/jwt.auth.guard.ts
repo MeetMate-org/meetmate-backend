@@ -1,17 +1,18 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
 import { UserService } from './user.service';
+import { ExecutionContext } from '@nestjs/common';
 
 @Injectable()
 export class JwtAuthGuard {
   constructor(private readonly userService: UserService) {}
 
-  canActivate(context: any): boolean {
+  canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest();
     const token = request.headers['x-access-token'];
 
     if (!token) {
-      throw new UnauthorizedException('Токен не надано');
+      throw new UnauthorizedException('Token not provided');
     }
 
     try {
@@ -19,7 +20,7 @@ export class JwtAuthGuard {
       request.user = decoded;
       return true;
     } catch (error) {
-      throw new UnauthorizedException('Невірний або прострочений токен');
+      throw new UnauthorizedException('Invalid or expired token');
     }
   }
 }

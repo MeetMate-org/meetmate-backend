@@ -9,8 +9,6 @@ import { UserModule } from './user/user.module';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-console.log('Mongo URI:', process.env.MONGO_URI);
-
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),

@@ -14,12 +14,12 @@ export class UserService {
     const { username, email, password } = userProps;
     const existingEmail = await this.userModel.findOne({ email });
     if (existingEmail) {
-      throw new Error('Користувач із цією електронною адресою вже існує');
+      throw new Error('A user with this email address already exists.');
     }
 
     const existingUsername = await this.userModel.findOne({ username });
     if (existingUsername) {
-      throw new Error('Користувач із таким іменем вже існує');
+      throw new Error('A user with that name already exists.');
     }
 
     const hashedPassword = await bcryptjs.hash(password, 10);
@@ -37,12 +37,12 @@ export class UserService {
     });
 
     if (!user) {
-      throw new Error('Недійсне ім’я користувача/email або пароль');
+      throw new Error('Invalid username/email or password');
     }
 
     const isMatch = await bcryptjs.compare(password, user.password);
     if (!isMatch) {
-      throw new Error('Недійсне ім’я користувача/email або пароль');
+      throw new Error('Invalid username/email or password');
     }
 
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
@@ -52,7 +52,7 @@ export class UserService {
   async getUserById(id: string) {
     const user = await this.userModel.findById(id);
     if (!user) {
-      throw new Error('Користувача не знайдено');
+      throw new Error('User not found');
     }
     return {
       username: user.username,

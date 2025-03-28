@@ -1,21 +1,23 @@
+require('dotenv').config();
+import configuration from './config/configuration';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UserController } from './user/user.controller';
-import { UserService } from './user/user.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './user/user.module';
-import * as dotenv from 'dotenv';
-dotenv.config();
+import { MeetingsController } from './meetings/meetings.controller';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({ 
+      load: [configuration],
+      envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
+     }),
     MongooseModule.forRoot(process.env.MONGO_URI || ''),
     UserModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, MeetingsController],
   providers: [AppService],
 })
 export class AppModule {}

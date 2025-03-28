@@ -4,7 +4,6 @@ import { Model } from 'mongoose';
 import { User, UserDocument } from './user.schema';
 import * as bcryptjs from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
-import { ObjectId } from 'mongodb';
 
 @Injectable()
 export class UserService {

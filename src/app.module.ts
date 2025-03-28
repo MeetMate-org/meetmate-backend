@@ -7,6 +7,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './user/user.module';
 import { MeetingsController } from './meetings/meetings.controller';
+import { MeetingsModule } from './meetings/meetings.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { MeetingsController } from './meetings/meetings.controller';
      }),
     MongooseModule.forRoot(process.env.MONGO_URI || ''),
     UserModule,
+    MeetingsModule,
   ],
   controllers: [AppController, MeetingsController],
   providers: [AppService],

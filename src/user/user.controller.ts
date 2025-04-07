@@ -8,7 +8,20 @@ export class UserController {
 
   @Post('signup')
   async signup(@Body() userProps: { username: string; email: string; password: string }) {
-    return this.userService.signup(userProps);
+    return this.userService.register(userProps);
+  }
+
+  @Post('verify-otp')
+  async verifyOtp(
+    @Body()
+    verifyProps: { email: string; otpToken: string; },
+  ) {
+    return this.userService.verifyOtp(verifyProps);
+  }
+
+  @Post('resend-otp/:userId')
+  async resendOtp(@Param("userId") userId: string) {
+    return this.userService.resendOtp(userId);
   }
 
   @Post('login')

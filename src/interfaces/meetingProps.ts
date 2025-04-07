@@ -7,4 +7,8 @@ export interface MeetingProps {
   createdAt: Date;
   updatedAt: Date;
   organizer: string;
+  times: {
+    value: string;
+    votes: number;
+  }[];
 }

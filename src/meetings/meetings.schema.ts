@@ -25,6 +25,12 @@ export class Meeting {
 
   @Prop({ required: true })
   createdAt: Date;
+
+  @Prop({ required: true })
+  times: {
+    value: Date;
+    votes: number;
+  }[];
 }
 
 export type MeetingPlainObject = Omit<Meeting, 'id'> & {

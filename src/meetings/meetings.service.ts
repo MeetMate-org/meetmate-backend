@@ -21,11 +21,17 @@ export class MeetingsService {
       ...createMeetingDto,
       startTime: new Date(createMeetingDto.startTime),
       endTime: new Date(createMeetingDto.endTime),
+      times: createMeetingDto.times.map((time) => ({
+        ...time,
+        value: new Date(time.value),
+      })),
     };
+    
     
     const createdMeeting = new this.meetingModel(meetingData);
     return createdMeeting.save();
   }
+  
 
   async deleteMeeting(id: string): Promise<Meeting> {
     const meeting = await this.getMeetingById(id);
@@ -63,4 +69,40 @@ export class MeetingsService {
 
     return updatedMeeting;
   }
+
+  async voteMeeting(id: string, vote: number): Promise<Meeting> {
+    const meeting = await this.meetingModel.findById(id).exec();
+    if (!meeting) {
+      throw new NotFoundException(`Meeting with ID ${id} not found`);
+    }
+  
+    console.log(meeting.times);
+  
+    // Перевірка валідності індексу vote
+    if (vote < 0 || vote >= meeting.times.length) {
+      throw new NotFoundException(`Invalid vote index for meeting with ID ${id}`);
+    }
+  
+    // Знаходимо індекс часу
+    const timeIndex = meeting.times.findIndex((time, index) => index === vote);
+    if (timeIndex === -1 || !meeting.times[timeIndex]) {
+      throw new NotFoundException(`Time slot not found for meeting with ID ${id}`);
+    }
+  
+    // Збільшуємо кількість голосів
+    meeting.times[timeIndex].votes += 1;
+  
+    // Оновлюємо документ у базі даних
+    const updatedMeeting = await this.meetingModel.findByIdAndUpdate(
+      id,
+      { times: meeting.times },
+      { new: true }
+    ).exec();
+  
+    if (!updatedMeeting) {
+      throw new NotFoundException(`Meeting with ID ${id} not found after voting`);
+    }
+  
+    return updatedMeeting;
+}
 }

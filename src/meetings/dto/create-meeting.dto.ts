@@ -1,6 +1,4 @@
 import { IsDateString, IsNotEmpty, IsString } from 'class-validator';
-import { Meeting } from '../meetings.schema';
-import { SchemaFactory } from '@nestjs/mongoose';
 
 export class CreateMeetingDto {
   @IsString()
@@ -17,4 +15,11 @@ export class CreateMeetingDto {
   @IsDateString()
   @IsNotEmpty()
   endTime: string;
+
+  @IsString({ each: true })
+  @IsNotEmpty({ each: true })
+  times: {
+    value: string;
+    votes: number;
+  }[];
 }

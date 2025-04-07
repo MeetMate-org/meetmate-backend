@@ -4,29 +4,101 @@ import { Model } from 'mongoose';
 import { User, UserDocument } from './user.schema';
 import * as bcryptjs from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
+import * as nodemailer from 'nodemailer';
+import * as speakeasy from 'speakeasy';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+  private transporter: nodemailer.Transporter;
 
-  async signup(userProps: { username: string; email: string; password: string }) {
+  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {
+    this.transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.HOST_ADDRESS,
+        pass: process.env.HOST_PASSWORD,
+      },
+    });
+  }
+
+  async register(userProps: { username: string; email: string; password: string }) {
     const { username, email, password } = userProps;
+  
     const existingEmail = await this.userModel.findOne({ email });
     if (existingEmail) {
       throw new Error('A user with this email address already exists.');
     }
-
+  
     const existingUsername = await this.userModel.findOne({ username });
     if (existingUsername) {
       throw new Error('A user with that name already exists.');
     }
+  
+    const otpSecret = speakeasy.generateSecret({ length: 20 });
+    const otpToken = speakeasy.totp({
+      secret: otpSecret.base32,
+      encoding: 'base32',
+    });
+  
+    // Створюємо користувача в базі даних
+    const newUser = new this.userModel({
+      username,
+      email,
+      password: await bcryptjs.hash(password, 10), // Хешуємо пароль
+      otpSecret: otpSecret.base32,
+      otpExpires: new Date(Date.now() + 10 * 60 * 1000), // OTP дійсний 10 хв
+      isVerified: false,
+    });
+  
+    await newUser.save();
+  
+    // Відправлення OTP на email
+    const mailOptions = {
+      from: process.env.HOST_ADDRESS,
+      to: email,
+      subject: 'OTP Verification',
+      text: `Your OTP is ${otpToken}. It will expire in 10 minutes.`,
+    };
+  
+    await this.transporter.sendMail(mailOptions);
+  
+    return { message: 'OTP sent to your email', userId: newUser._id };
+  }
 
-    const hashedPassword = await bcryptjs.hash(password, 10);
-    const user = new this.userModel({ username, email, password: hashedPassword });
+  async verifyOtp(verifyProps: { email: string; otpToken: string }) {
+    const { email, otpToken } = verifyProps;
+  
+    // Знаходимо користувача за email
+    const user = await this.userModel.findOne({ email });
+    if (!user) {
+      throw new Error('User not found');
+    }
+  
+    // Перевіряємо, чи OTP не закінчився
+    if (!user.otpExpires || user.otpExpires < new Date()) {
+      throw new Error('OTP has expired');
+    }
+  
+    // Верифікуємо OTP
+    const isValid = speakeasy.totp.verify({
+      secret: user.otpSecret, // Беремо секрет із бази даних
+      encoding: 'base32',
+      token: otpToken,
+      window: 2, 
+    });
+
+  
+    if (!isValid) {
+      throw new Error('Invalid OTP');
+    }
+  
+    // Позначаємо користувача як верифікованого
+    user.isVerified = true;
+    user.otpSecret = ''; // Очищаємо секрет
+    user.otpExpires = undefined; // Очищаємо час дії OTP
     await user.save();
-
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    return { token, userId: user._id };
+  
+    return { message: 'Email verified successfully' };
   }
 
   async login(userProps: { identifier: string; password: string }) {
@@ -39,6 +111,10 @@ export class UserService {
       throw new Error('Invalid username/email or password');
     }
 
+    if (!user.isVerified) {
+      throw new Error('Please verify your email first');
+    }
+
     const isMatch = await bcryptjs.compare(password, user.password);
     if (!isMatch) {
       throw new Error('Invalid username/email or password');
@@ -46,6 +122,32 @@ export class UserService {
 
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
     return { token, userId: user._id };
+  }
+
+  async resendOtp(userId: string) {
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const otpToken = speakeasy.totp({
+      secret: user.otpSecret,
+      encoding: 'base32'
+    });
+
+    user.otpExpires = new Date(Date.now() + 10*60*1000);
+    await user.save();
+
+    const mailOptions = {
+      from: process.env.HOST_ADDRESS,
+      to: user.email,
+      subject: 'New OTP Verification',
+      text: `Your new OTP is ${otpToken}. It will expire in 10 minutes.`,
+    };
+
+    await this.transporter.sendMail(mailOptions);
+
+    return { message: 'New OTP sent to your email' };
   }
 
   async getUserById(id: string) {

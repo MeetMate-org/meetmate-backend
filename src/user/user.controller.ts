@@ -1,6 +1,11 @@
-import { Controller, Post, Body, Get, Param, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, UseGuards, Req, Delete, Request } from '@nestjs/common';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from './jwt.auth.guard';
+import { SaveGoogleTokensDto } from './dto/google.token.dto';
+
+interface RequestWithUser extends Request {
+  user: { userId: string };
+}
 
 @Controller('user')
 export class UserController {
@@ -16,9 +21,36 @@ export class UserController {
     return this.userService.login(userProps);
   }
 
+  @Post('generate-access-key')
+  @UseGuards(JwtAuthGuard)
+  async generateAccessKey(@Req() req: RequestWithUser) {
+    const userId = req.user.userId;
+    console.log(userId);
+    return this.userService.generateAccessKey(userId);
+  }
+
+  @Post('private-info')
+  @UseGuards(JwtAuthGuard)
+  async getPrivateUserData(@Body() body: { userId: string; accessKey: string }) {
+    const { userId, accessKey } = body;
+    return this.userService.getUserByAccessKey(userId, accessKey);
+  }
+
+  @Delete('delete-access-key')
+  @UseGuards(JwtAuthGuard)
+  async deleteAccessKey(@Req() req: RequestWithUser) {
+    const userId = req.user.userId;
+    return this.userService.deleteAccessKey(userId);
+  }
+
   @Get(':id')
   @UseGuards(JwtAuthGuard)
   async getUserById(@Param('id') id: string) {
     return this.userService.getUserById(id);
+  }
+
+  @Post('save-google-tokens')
+  async saveGoogleTokens(@Body() dto: SaveGoogleTokensDto) {
+    return this.userService.saveGoogleTokens(dto);
   }
 }

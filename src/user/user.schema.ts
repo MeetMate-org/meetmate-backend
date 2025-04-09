@@ -19,6 +19,18 @@ export class User {
 
   @Prop({ default: Date.now })
   createdAt: Date;
+
+  @Prop()
+  accessKey?: string;
+
+  @Prop()
+  googleAccessToken?: string;
+
+  @Prop()
+  googleRefreshToken?: string;
+
+  @Prop()
+  googleTokenExpiryDate?: Date;
 }
 
 export type UserDocument = User & Document;

@@ -1,98 +1,154 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# MeetMate Server  
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+MeetMate is the server-side component of an application built using the [NestJS](https://nestjs.com/) framework. It provides an API for managing meetings and user-related operations.  
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Description  
 
-## Description
+This repository contains the backend implementation for the MeetMate application. It is written in TypeScript and follows NestJS's modular architecture. The application includes features such as API documentation, environment-based configuration, and testing support.  
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Project Setup  
 
-## Project setup
+### Prerequisites  
 
-```bash
-$ npm install
+- Node.js (>= 14.x)  
+- pnpm (>= 7.x)  
+
+### Installation  
+
+Install dependencies using `pnpm`:  
+
+```bash  
+$ pnpm install  
+```  
+
+## Running the Project  
+
+### Development Mode  
+
+```bash  
+$ pnpm run start  
+```  
+
+### Watch Mode (Auto-Restart)  
+
+```bash  
+$ pnpm run start:dev  
+```  
+
+### Production Mode  
+
+```bash  
+$ pnpm run start:prod  
+```  
+
+## API Documentation  
+
+API documentation is generated using Swagger and is available at `/api` after starting the server. The Swagger configuration is located in `src/main.ts`:  
+
+```typescript  
+const config = new DocumentBuilder()  
+  .setTitle('MeetMate API')  
+  .setDescription('MeetMate API docs')  
+  .setVersion('1.0')  
+  .addApiKey(  
+    { type: 'apiKey', name: 'x-access-token', in: 'header' },  
+    'x-access-token'  
+  )  
+  .build();  
+
+const document = SwaggerModule.createDocument(app, config);  
+SwaggerModule.setup('api', app, document);  
+```  
+
+## Environment Configuration  
+
+The application uses environment variables for configuration. Environment configuration files are located in the root directory and follow the `.env.<environment>` format, e.g.:  
+
+- `.env.development`  
+- `.env.production`  
+
+The active environment is determined by the `NODE_ENV` variable. If not set, it defaults to `development`. Environment file loading is implemented in `src/main.ts`:  
+
+```typescript  
+const envPath = path.resolve(  
+  __dirname,  
+  `../.env.${process.env.NODE_ENV || 'development'}`  
+);  
+require('dotenv').config({ path: envPath });  
+```  
+
+## Testing  
+
+### Unit Tests  
+
+```bash  
+$ pnpm run test  
+```  
+
+### End-to-End Tests  
+
+```bash  
+$ pnpm run test:e2e  
+```  
+
+### Test Coverage  
+
+```bash  
+$ pnpm run test:cov  
+```  
+
+## Project Structure  
+
 ```
+src/  
+  main.ts  
+  app.module.ts  
+  app.controller.ts  
+  app.service.ts  
+  config/  
+    configuration.ts  
+  meetings/  
+    meetings.controller.ts  
+    meetings.service.ts  
+    meetings.module.ts  
+  interfaces/  
+    meetingProps.ts  
+test/  
+  app.e2e-spec.ts  
+```  
 
-## Compile and run the project
+### Key Directories  
 
-```bash
-# development
-$ npm run start
+- `src/` – Contains the main application code.  
+- `main.ts` – The application entry point.  
+- `config/` – Configuration-related files.  
+- `meetings/` – Module for managing meetings.  
+- `interfaces/` – TypeScript interfaces for data structures.  
+- `test/` – End-to-end test files.  
 
-# watch mode
-$ npm run start:dev
+## Deployment  
 
-# production mode
-$ npm run start:prod
-```
+To deploy the application, follow these steps:  
 
-## Run tests
+1. Configure environment variables in `.env.<environment>` files.  
+2. Build the project:  
 
-```bash
-# unit tests
-$ npm run test
+```bash  
+$ pnpm run build  
+```  
 
-# e2e tests
-$ npm run test:e2e
+3. Run the application in production mode:  
 
-# test coverage
-$ npm run test:cov
-```
+```bash  
+$ pnpm run start:prod  
+```  
 
-## Deployment
+## Resources  
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+- [NestJS Documentation](https://docs.nestjs.com/)  
+- [Swagger Documentation](https://swagger.io/docs/)  
+- [pnpm Documentation](https://pnpm.io/)  
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+## License  
 
-```bash
-$ npm install -g mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+This project is licensed under the MIT License.

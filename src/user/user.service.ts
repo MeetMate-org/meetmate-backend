@@ -97,8 +97,15 @@ export class UserService {
     user.otpSecret = ''; // Очищаємо секрет
     user.otpExpires = undefined; // Очищаємо час дії OTP
     await user.save();
+
+    // generate JWT token
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) {
+      throw new Error('JWT_SECRET is not defined in the environment variables');
+    }
+    const token = jwt.sign({ userId: user._id }, jwtSecret, { expiresIn: '1h' });
   
-    return { message: 'Email verified successfully' };
+    return { message: 'Email verified successfully', token: token };
   }
 
   async login(userProps: { identifier: string; password: string }) {

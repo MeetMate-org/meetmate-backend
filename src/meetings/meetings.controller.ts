@@ -14,9 +14,15 @@ export class MeetingsController {
   @ApiResponse({ status: 200, description: 'Meeting found' })
   @ApiResponse({ status: 404, description: 'Meeting not found' })
   async getMeetingById(@Param('id') id: string) {
-    console.log(new Date());
-    
     return this.meetingsService.getMeetingById(id);
+  }
+
+  @Get("/user/:userId")
+  @ApiResponse({ status: 200, description: 'Meetings found' })
+  @ApiResponse({ status: 404, description: 'Meetings not found' })
+  @UseGuards(JwtAuthGuard)
+  async getMeetingsByUserId(@Param('userId') userId: string) {
+    return this.meetingsService.getMeetingsByUserId(userId);
   }
 
   @Post("create") 

@@ -16,6 +16,14 @@ export class MeetingsService {
     return meeting;
   }
 
+  async getMeetingsByUserId(userId: string): Promise<Meeting[]> {
+    const meetings = await this.meetingModel.find({
+      organizer: userId
+    });
+
+    return meetings;
+  }
+
   async createMeeting(createMeetingDto: CreateMeetingDto): Promise<Meeting> {
     const meetingData = {
       ...createMeetingDto,

@@ -1,79 +1,57 @@
-import { Controller, Post, Patch, Delete, Body, Req, UseGuards, Param, Get, } from '@nestjs/common';
+//calendar.controller.ts
+import { Controller, Post, Put, Delete, Body, Param, UseGuards, Req, Get, BadRequestException } from '@nestjs/common';
 import { CalendarService } from './calendar.service';
-import { JwtAuthGuard } from '../user/jwt.auth.guard';
+import { CreateEventDto } from './dto/create-event.dto';
+import { UpdateEventDto } from './dto/update-event.dto';
+import { JwtAuthGuard } from '../guards/jwt.auth.guard';
+import { AccessKeyGuard } from '../guards/access-key.guard';
+import { UserService } from '../user/user.service';
 
 @Controller('calendar')
 export class CalendarController {
-  constructor(private readonly calendarService: CalendarService) {}
+  constructor(
+    private readonly calendarService: CalendarService,
+    private readonly userService: UserService
+  ) {}
 
-  @Post('create-event')
+  @Get('events')
   @UseGuards(JwtAuthGuard)
-  async createEvent(
-    @Req() req,
-    @Body() body: {
-      userId: string;
-      accessKey: string;
-      title: string;
-      location?: string;
-      description?: string;
-      startDateTime: string;
-      endDateTime: string;
-    },
-  ) {
-    const creatorId = req.user.userId;
-    return this.calendarService.createEvent({
-      ...body,
-      creatorId,
-    });
+  async getUserEvents(@Body() body: { accessKey?: string }, @Req() req) {
+    let user;
+    if (body.accessKey) {
+      const userId = await this.userService.getUserIdByAccessKey(body.accessKey);
+      if (!userId) {
+        throw new BadRequestException('Invalid AccessKey');
+      }
+      user = await this.userService.getUserByIdForAuth(userId);
+    } else {
+      user = await this.userService.getUserByIdForAuth(req.user.userId);
+    }
+    return this.calendarService.getEvents(user);
   }
 
-  @Patch('update-event')
-  @UseGuards(JwtAuthGuard)
-  async updateEvent(
-    @Req() req,
-    @Body() body: {
-      calendarOwnerId: string;
-      accessKey: string;
-      eventId: string;
-      title?: string;
-      location?: string;
-      description?: string;
-      startDateTime?: string;
-      endDateTime?: string;
-    },
-  ) {
-    const requesterId = req.user.userId;
-    return this.calendarService.updateEvent({
-      ...body,
-      requesterId,
-    });
+  @Post('create')
+  @UseGuards(JwtAuthGuard, AccessKeyGuard)
+  async createEvent(@Body() createEventDto: CreateEventDto, @Req() req) {
+    const user = await this.userService.getUserByIdForAuth(req.user.userId);
+    return this.calendarService.createEvent(createEventDto, user);
   }
 
-  @Delete('delete-event/:eventId')
-  @UseGuards(JwtAuthGuard)
-  async deleteEvent(
-    @Req() req,
+  @Put('edit/:eventId')
+  @UseGuards(JwtAuthGuard, AccessKeyGuard)
+  async editEvent(
     @Param('eventId') eventId: string,
-    @Body() body: {
-      calendarOwnerId: string;
-      accessKey: string;
-    },
+    @Body() updateEventDto: UpdateEventDto,
+    @Req() req
   ) {
-    const requesterId = req.user.userId;
-    return this.calendarService.deleteEvent({
-      eventId,
-      calendarOwnerId: body.calendarOwnerId,
-      accessKey: body.accessKey,
-      requesterId,
-    });
+    const user = await this.userService.getUserByIdForAuth(req.user.userId);
+    return this.calendarService.editEvent(eventId, updateEventDto, user);
   }
 
-  @Get('my-events')
-  @UseGuards(JwtAuthGuard)
-  async getMyEvents(@Req() req) {
-    const userId = req.user.userId;
-    return this.calendarService.getMyGoogleEvents(userId);
+  @Delete('delete/:eventId')
+  @UseGuards(JwtAuthGuard, AccessKeyGuard)
+  async deleteEvent(@Param('eventId') eventId: string, @Req() req) {
+    const user = await this.userService.getUserByIdForAuth(req.user.userId);
+    return this.calendarService.deleteEvent(eventId, user);
   }
-
-
 }

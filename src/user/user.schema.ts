@@ -1,3 +1,4 @@
+//user.schema.ts
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
@@ -31,6 +32,8 @@ export class User {
 
   @Prop()
   googleTokenExpiryDate?: Date;
+
+  _id: string;
 }
 
 export type UserDocument = User & Document;

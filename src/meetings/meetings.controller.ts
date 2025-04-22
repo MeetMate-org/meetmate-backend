@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { MeetingsService } from './meetings.service';
 import { MeetingProps } from 'src/interfaces/meetingProps';
-import { JwtAuthGuard } from 'src/user/jwt.auth.guard';
+import { JwtAuthGuard } from 'src/guards/jwt.auth.guard';
 
 @Controller('meetings')
 export class MeetingsController {

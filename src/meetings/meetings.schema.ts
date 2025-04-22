@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 
-
 @Schema() 
 export class Meeting {
   static name = 'Meeting';
@@ -31,6 +30,9 @@ export class Meeting {
     value: Date;
     votes: number;
   }[];
+
+  @Prop({ required: false })
+  link: string;
 }
 
 export type MeetingPlainObject = Omit<Meeting, 'id'> & {

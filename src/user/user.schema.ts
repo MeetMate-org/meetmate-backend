@@ -1,3 +1,4 @@
+//user.schema.ts
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
@@ -28,6 +29,20 @@ export class User {
 
   @Prop({ default: Date.now })
   createdAt: Date;
+
+  @Prop()
+  accessKey?: string;
+
+  @Prop()
+  googleAccessToken?: string;
+
+  @Prop()
+  googleRefreshToken?: string;
+
+  @Prop()
+  googleTokenExpiryDate?: Date;
+
+  _id: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

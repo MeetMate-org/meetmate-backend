@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { MeetingsService } from './meetings.service';
 import { MeetingProps } from 'src/interfaces/meetingProps';
-import { JwtAuthGuard } from 'src/user/jwt.auth.guard';
+import { JwtAuthGuard } from 'src/guards/jwt.auth.guard';
 import { ApiBody, ApiHeader, ApiResponse } from '@nestjs/swagger';
 import { CreateMeetingDto } from './dto/create-meeting.dto';
 import { UpdateMeetingDto } from './dto/update-meeting.dto';

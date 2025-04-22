@@ -22,4 +22,15 @@ export class CreateMeetingDto {
     value: string;
     votes: number;
   }[];
+
+  @IsString()
+  @IsNotEmpty()
+  organizer: string;
+
+  @IsString()
+  @IsNotEmpty()
+  participants: string[];
+
+  @IsString()
+  link?: string;
 }

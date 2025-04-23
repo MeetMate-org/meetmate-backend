@@ -24,6 +24,14 @@ export class MeetingsService {
     return meetings;
   }
 
+  async getAllMeetings(): Promise<Meeting[]> {
+    const meetings = await this.meetingModel.find().exec();
+    if (!meetings || meetings.length === 0) {
+      throw new NotFoundException('No meetings found');
+    }
+    return meetings;
+  }
+
   async createMeeting(createMeetingDto: CreateMeetingDto): Promise<Meeting> {
     const meetingData = {
       ...createMeetingDto,

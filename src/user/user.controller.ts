@@ -1,12 +1,14 @@
-import { Controller, Post, Body, Get, Param, UseGuards } from '@nestjs/common';
+//user.service.ts
+import { Controller, Post, Body, Get, Param, UseGuards, Req, Delete } from '@nestjs/common';
 import { UserService } from './user.service';
-import { JwtAuthGuard } from './jwt.auth.guard';
+import { JwtAuthGuard } from 'src/guards/jwt.auth.guard';
 import { ApiBody, ApiResponse } from '@nestjs/swagger';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  // Реєстрація нового користувача
   @Post('signup')
   @ApiResponse({ status: 201, description: 'OTP code sent' })
   @ApiResponse({ status: 400, description: 'Bad request' })
@@ -74,6 +76,7 @@ export class UserController {
     return this.userService.resendOtp(userId);
   }
 
+  // Авторизація користувача
   @Post('login')
   @ApiResponse({ status: 200, description: 'User logged in' })
   @ApiResponse({ status: 400, description: 'Bad request' })
@@ -95,6 +98,7 @@ export class UserController {
     return this.userService.login(userProps);
   }
 
+  // Отримання інформації про користувача за ID
   @Get(':id')
   @UseGuards(JwtAuthGuard)
   @ApiResponse({ status: 200, description: 'User found' })
@@ -115,5 +119,29 @@ export class UserController {
   })
   async getUserById(@Param('id') id: string) {
     return this.userService.getUserById(id);
+  }
+
+  // Генерація нового `accessKey`
+  @Post('generate-access-key')
+  @UseGuards(JwtAuthGuard)
+  async generateAccessKey(@Req() req) {
+    const userId = req.user.userId;
+    return this.userService.generateAccessKey(userId);
+  }
+
+  // Скидання `accessKey`
+  @Delete('delete-access-key')
+  @UseGuards(JwtAuthGuard)
+  async deleteAccessKey(@Req() req) {
+    const userId = req.user.userId;
+    return this.userService.deleteAccessKey(userId);
+  }
+
+  // Видалення Google токенів
+  @Delete('delete-google-tokens')
+  @UseGuards(JwtAuthGuard)
+  async deleteGoogleTokens(@Req() req) {
+    const userId = req.user.userId;
+    return this.userService.deleteGoogleTokens(userId);
   }
 }

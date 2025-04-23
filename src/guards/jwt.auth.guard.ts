@@ -1,3 +1,4 @@
+//jwt.auth.guard.ts
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
 import { ExecutionContext } from '@nestjs/common';
@@ -6,7 +7,7 @@ import { ExecutionContext } from '@nestjs/common';
 export class JwtAuthGuard {
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest();
-    const token = request.headers['x-access-token'];
+    const token = request.headers['x-access-token']; // Використовуємо x-access-token для JWT
 
     if (!token) {
       throw new UnauthorizedException('Token not provided');

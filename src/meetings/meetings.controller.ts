@@ -36,8 +36,8 @@ export class MeetingsController {
     return this.meetingsService.getMeetingsByUserId(userId);
   }
 
-  @Get("/all")
-  @ApiResponse({ status: 200, description: 'All meetings found' })
+  @Get("/user/attending/:userId")
+  @ApiResponse({ status: 200, description: 'Meetings found' })
   @ApiResponse({ status: 404, description: 'Meetings not found' })
   @ApiHeader({
     name: 'x-access-token',
@@ -47,12 +47,12 @@ export class MeetingsController {
   })
   @ApiBody({
     type: String,
-    description: 'Fetch all meetings',
+    description: 'Fetch all meetings that the user is attending',
     required: true,
   })
   @UseGuards(JwtAuthGuard)
-  async getAllMeetings() {
-    return this.meetingsService.getAllMeetings();
+  async getAttendingMeetings(@Param('userId') userId: string) {
+    return this.meetingsService.getAttendingMeetings(userId);
   }
 
   @Post("create") 

@@ -24,11 +24,15 @@ export class MeetingsService {
     return meetings;
   }
 
-  async getAllMeetings(): Promise<Meeting[]> {
-    const meetings = await this.meetingModel.find().exec();
+  async getAttendingMeetings(userId: string): Promise<Meeting[]> {
+    const meetings = await this.meetingModel.find({
+      participants: userId
+    });
+
     if (!meetings || meetings.length === 0) {
-      throw new NotFoundException('No meetings found');
+      throw new NotFoundException('No meetings found for this user');
     }
+
     return meetings;
   }
 

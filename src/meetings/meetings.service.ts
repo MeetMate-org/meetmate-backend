@@ -4,10 +4,14 @@ import { Meeting, MeetingDocument, MeetingPlainObject } from './meetings.schema'
 import { Model } from 'mongoose';
 import { CreateMeetingDto } from './dto/create-meeting.dto';
 import { UpdateMeetingDto } from './dto/update-meeting.dto';
+import { User, UserDocument } from 'src/user/user.schema';
 
 @Injectable()
 export class MeetingsService {
-  constructor(@InjectModel(Meeting.name) private meetingModel: Model<MeetingDocument>) {}
+  constructor(
+    @InjectModel(Meeting.name) private meetingModel: Model<MeetingDocument>, 
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
+  ) {}
   async getMeetingById(id: string): Promise<Meeting> {
     const meeting = await this.meetingModel.findById(id).exec();
     if (!meeting) {
@@ -25,15 +29,33 @@ export class MeetingsService {
   }
 
   async getAttendingMeetings(userId: string): Promise<Meeting[]> {
-    const meetings = await this.meetingModel.find({
-      participants: userId
-    });
+    try {
+      const user = await this.userModel.findById(userId).exec();
+  
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+      
 
-    if (!meetings || meetings.length === 0) {
-      throw new NotFoundException('No meetings found for this user');
+      // retrieve meetings where the user with email is an attendee
+      const meetings = await this.meetingModel.find({
+        participants: user.email
+      }).exec();
+
+      console.log(meetings);
+      
+  
+      if (!meetings || meetings.length === 0) {
+        throw new NotFoundException('No meetings found for this user');
+      }
+  
+      return meetings;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error; 
+      }
+      throw new NotFoundException('User not found');
     }
-
-    return meetings;
   }
 
   async createMeeting(createMeetingDto: CreateMeetingDto): Promise<Meeting> {

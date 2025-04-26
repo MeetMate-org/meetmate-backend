@@ -26,7 +26,7 @@
     "@nestjs/jwt": "^11.0.0",
     "@nestjs/mongoose": "^11.0.2",
     "@nestjs/platform-express": "^11.0.1",
-    "@nestjs/swagger": "^11.1.2",
+    "@nestjs/swagger": "^11.1.5",
     "axios": "^1.8.4",
     "bcryptjs": "^3.0.2",
     "class-transformer": "^0.5.1",

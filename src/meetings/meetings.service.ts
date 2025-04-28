@@ -1,4 +1,3 @@
-//meetings.service.ts
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Meeting, MeetingDocument, MeetingPlainObject } from './meetings.schema';
@@ -7,11 +6,13 @@ import { CreateMeetingDto } from './dto/create-meeting.dto';
 import { UpdateMeetingDto } from './dto/update-meeting.dto';
 import { UserService } from 'src/user/user.service';
 import { PusherService } from 'src/pusher/pusher.service';
+import { User, UserDocument } from 'src/user/user.schema';
 
 @Injectable()
 export class MeetingsService {
   constructor(
     @InjectModel(Meeting.name) private meetingModel: Model<MeetingDocument>,
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
     private readonly pusherService: PusherService,
     private readonly userService: UserService,
   ) {}
@@ -22,6 +23,44 @@ export class MeetingsService {
       throw new NotFoundException(`Meeting with ID ${id} not found`);
     }
     return meeting;
+  }
+
+  async getMeetingsByUserId(userId: string): Promise<Meeting[]> {
+    const meetings = await this.meetingModel.find({
+      organizer: userId
+    });
+
+    return meetings;
+  }
+
+  async getAttendingMeetings(userId: string): Promise<Meeting[]> {
+    try {
+      const user = await this.userModel.findById(userId).exec();
+  
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+      
+
+      // retrieve meetings where the user with email is an attendee
+      const meetings = await this.meetingModel.find({
+        participants: user.email
+      }).exec();
+
+      console.log(meetings);
+      
+  
+      if (!meetings || meetings.length === 0) {
+        throw new NotFoundException('No meetings found for this user');
+      }
+  
+      return meetings;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error; 
+      }
+      throw new NotFoundException('User not found');
+    }
   }
 
   async createMeeting(createMeetingDto: CreateMeetingDto): Promise<Meeting> {

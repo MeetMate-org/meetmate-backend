@@ -15,6 +15,6 @@ import { User, UserSchema } from 'src/user/user.schema';
   ],
   controllers: [MeetingsController],
   providers: [MeetingsService, PusherService],
-  exports: [MeetingsService, PusherService], 
+  exports: [MeetingsService, PusherService],
 })
 export class MeetingsModule {}

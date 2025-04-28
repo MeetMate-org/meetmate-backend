@@ -15,9 +15,35 @@ export class MeetingsController {
   @ApiResponse({ status: 200, description: 'Meeting found' })
   @ApiResponse({ status: 404, description: 'Meeting not found' })
   async getMeetingById(@Param('id') id: string) {
-    console.log(new Date());
-    
     return this.meetingsService.getMeetingById(id);
+  }
+
+  @Get("user/:userId")
+  @ApiResponse({ status: 200, description: 'Meetings found' })
+  @ApiResponse({ status: 404, description: 'Meetings not found' })
+  @ApiHeader({
+    name: 'x-access-token',
+    description: 'JWT token for authentication',
+    required: true,
+    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+  })
+  @UseGuards(JwtAuthGuard)
+  async getMeetingsByUserId(@Param('userId') userId: string) {
+    return this.meetingsService.getMeetingsByUserId(userId);
+  }
+
+  @Get("user/attending/:userId")
+  @ApiResponse({ status: 200, description: 'Meetings found' })
+  @ApiResponse({ status: 404, description: 'Meetings not found' })
+  @ApiHeader({
+    name: 'x-access-token',
+    description: 'JWT token for authentication',
+    required: true,
+    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+  })
+  @UseGuards(JwtAuthGuard)
+  async getAttendingMeetings(@Param('userId') userId: string) {
+    return this.meetingsService.getAttendingMeetings(userId);
   }
 
   @Post("create") 

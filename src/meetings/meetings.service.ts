@@ -36,7 +36,7 @@ export class MeetingsService {
       ]
     });
 
-    return meetings;
+    return meetings.length > 0 ? meetings : [];
   }
 
   async getMeetingsByUserId(userId: string): Promise<Meeting[]> {
@@ -44,7 +44,7 @@ export class MeetingsService {
       organizer: userId
     });
 
-    return meetings;
+    return meetings.length > 0 ? meetings : [];
   }
 
   async getAttendingMeetings(userId: string): Promise<Meeting[]> {
@@ -61,11 +61,7 @@ export class MeetingsService {
         participants: user.email
       }).exec();
 
-      if (!meetings || meetings.length === 0) {
-        throw new NotFoundException('No meetings found for this user');
-      }
-  
-      return meetings;
+      return meetings.length > 0 ? meetings : [];
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw error; 

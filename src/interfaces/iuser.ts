@@ -1,3 +1,5 @@
+import mongoose from 'mongoose';
+
 export interface IUser {
   username: string;
   email: string;
@@ -5,7 +7,6 @@ export interface IUser {
   isVerified: boolean;
   otpSecret?: string;
   otpExpires?: Date;
-  avatar?: string;
   createdAt: Date;
   accessKey?: string;
   googleAccessToken?: string;
@@ -19,5 +20,4 @@ export interface IUser {
     };
     organizer: string;
   }[];
-  _id: string;
 }

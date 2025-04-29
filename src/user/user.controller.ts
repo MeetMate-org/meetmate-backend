@@ -1,5 +1,5 @@
 //user.service.ts
-import { Controller, Post, Body, Get, Param, UseGuards, Req, Delete } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, UseGuards, Req, Delete, Put } from '@nestjs/common';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from 'src/guards/jwt.auth.guard';
 import { ApiBody, ApiResponse } from '@nestjs/swagger';
@@ -29,6 +29,33 @@ export class UserController {
   })
   async signup(@Body() userProps: { username: string; email: string; password: string }) {
     return this.userService.register(userProps);
+  }
+
+  @Put("edit/:userId")
+  @ApiResponse({ status: 200, description: 'User updated' })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  @ApiBody({
+    type: Object,
+    examples: {
+      example1: {
+        summary: 'Example user update',
+        value: {
+          username: 'string',
+          email: "string",
+          password: 'string',
+        },
+      },
+    },
+    description: 'User update properties',
+    required: true,
+  })
+  @UseGuards(JwtAuthGuard)
+  async editUser(
+    @Param("userId") userId: string,
+    @Body() userProps: { username: string; email: string; password: string },
+  ) {
+    return this.userService.editUser(userId, userProps);
   }
 
   @Post('verify-otp')
@@ -120,7 +147,7 @@ export class UserController {
     return this.userService.getUserById(id);
   }
 
-  @Get("account")
+  @Get("account/:userId")
   @ApiResponse({ status: 200, description: 'User account found' })
   @ApiResponse({ status: 404, description: 'User not found' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -138,8 +165,8 @@ export class UserController {
     required: true,
   })
   @UseGuards(JwtAuthGuard)
-  async getUserAccount(@Req() req) {
-    return this.userService.getAccount(req.user.userId);
+  async getUserAccount(@Param("userId") userId: string) {    
+    return this.userService.getAccount(userId);
   }
 
   // Генерація нового `accessKey`

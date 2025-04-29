@@ -1,7 +1,7 @@
 //user.service.ts
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { User, UserDocument } from './user.schema';
 import * as crypto from 'crypto';
 import * as bcryptjs from 'bcryptjs';
@@ -128,6 +128,23 @@ export class UserService {
     return { token, userId: user._id };
   }
 
+  async editUser(userId: string, updateProps: { username?: string; email?: string; password?: string }) {
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (updateProps.username) {
+      user.username = updateProps.username;
+    }
+    if (updateProps.email) {
+      user.email = updateProps.email;
+    }
+
+    await user.save();
+    return { message: 'User updated successfully' };
+  }
+
   async resendOtp(userId: string) {
     const user = await this.userModel.findById(userId);
     if (!user) {
@@ -172,7 +189,20 @@ export class UserService {
     if (!user) {
       throw new NotFoundException(`User with ID ${userId} not found`);
     }
-    return user;
+    return {
+      username: user.username,
+      email: user.email,
+      createdAt: user.createdAt,
+      notifications: user.notifications,
+      accessKey: user.accessKey,
+      googleAccessToken: user.googleAccessToken,
+      googleRefreshToken: user.googleRefreshToken,
+      googleTokenExpiryDate: user.googleTokenExpiryDate,
+      isVerified: user.isVerified,
+      password: user.password,
+      otpSecret: user.otpSecret,
+      otpExpires: user.otpExpires,
+    };
   }
 
   async getUserIdByAccessKey(accessKey: string): Promise<string | null> {

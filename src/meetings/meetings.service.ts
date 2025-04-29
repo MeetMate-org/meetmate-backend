@@ -47,9 +47,6 @@ export class MeetingsService {
         participants: user.email
       }).exec();
 
-      console.log(meetings);
-      
-  
       if (!meetings || meetings.length === 0) {
         throw new NotFoundException('No meetings found for this user');
       }
@@ -122,9 +119,7 @@ export class MeetingsService {
     if (!meeting) {
       throw new NotFoundException(`Meeting with ID ${id} not found`);
     }
-  
-    console.log(meeting.times);
-  
+    
     // Перевірка валідності індексу vote
     if (vote < 0 || vote >= meeting.times.length) {
       throw new NotFoundException(`Invalid vote index for meeting with ID ${id}`);

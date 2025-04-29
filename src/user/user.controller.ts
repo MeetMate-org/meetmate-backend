@@ -100,7 +100,6 @@ export class UserController {
 
   // Отримання інформації про користувача за ID
   @Get(':id')
-  @UseGuards(JwtAuthGuard)
   @ApiResponse({ status: 200, description: 'User found' })
   @ApiResponse({ status: 404, description: 'User not found' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })

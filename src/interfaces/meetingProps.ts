@@ -1,3 +1,4 @@
+//meetingProps.ts
 export interface MeetingProps {
   title: string;
   description: string;

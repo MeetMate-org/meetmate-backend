@@ -1,3 +1,4 @@
+//meetings.controller.ts
 import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { MeetingsService } from './meetings.service';
 import { MeetingProps } from 'src/interfaces/meetingProps';
@@ -150,5 +151,35 @@ export class MeetingsController {
   @UseGuards(JwtAuthGuard)
   async voteMeeting(@Param('id') id: string, @Body('vote') vote: number) {
     return this.meetingsService.voteMeeting(id, vote);
+  }
+
+  @Post('notification/:userId')
+  @UseGuards(JwtAuthGuard)
+  @ApiResponse({ status: 201, description: 'Notification created and sent' })
+  @ApiBody({
+    schema: {
+      example: {
+        message: {
+          title: 'Daily meeting',
+          startTime: '2025-04-28T10:00:00Z',
+          endTime: '2025-04-28T11:00:00Z',
+        },
+        organizer: 'organizerId',
+      },
+    },
+  })
+  
+  async createNotificationWithPusher(
+    @Param('userId') userId: string,
+    @Body() notification: { message: { title: string; startTime: Date; endTime: Date }; organizer: string }
+  ) {
+    return this.meetingsService.createNotificationWithPusher(userId, notification);
+  }
+
+  @Get('notifications/:userId')
+  @UseGuards(JwtAuthGuard)
+  @ApiResponse({ status: 200, description: 'User notifications retrieved' })
+  async getUserNotifications(@Param('userId') userId: string) {
+    return this.meetingsService.getUserNotifications(userId);
   }
 }

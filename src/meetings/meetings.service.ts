@@ -4,18 +4,23 @@ import { Meeting, MeetingDocument, MeetingPlainObject } from './meetings.schema'
 import { Model } from 'mongoose';
 import { CreateMeetingDto } from './dto/create-meeting.dto';
 import { UpdateMeetingDto } from './dto/update-meeting.dto';
+import { UserService } from 'src/user/user.service';
+import { PusherService } from 'src/pusher/pusher.service';
 import { User, UserDocument } from 'src/user/user.schema';
 
 @Injectable()
 export class MeetingsService {
   constructor(
-    @InjectModel(Meeting.name) private meetingModel: Model<MeetingDocument>, 
+    @InjectModel(Meeting.name) private meetingModel: Model<MeetingDocument>,
     @InjectModel(User.name) private userModel: Model<UserDocument>,
+    private readonly pusherService: PusherService,
+    private readonly userService: UserService,
   ) {}
+
   async getMeetingById(id: string): Promise<Meeting> {
-    const meeting = await this.meetingModel.findById(id).exec();
+    const meeting = await this.meetingModel.findById(id).lean<MeetingPlainObject>().exec();
     if (!meeting) {
-      throw new Error('Meeting not found');
+      throw new NotFoundException(`Meeting with ID ${id} not found`);
     }
     return meeting;
   }
@@ -146,5 +151,26 @@ export class MeetingsService {
     }
   
     return updatedMeeting;
-}
+  }
+
+  async createNotificationWithPusher(
+    userId: string, 
+    notification: { 
+      message: { title: string; startTime: Date; endTime: Date }; 
+      organizer: string; 
+    }
+  ) {
+    // Оновлюємо користувача в базі даних
+    const user = await this.userService.addNotification(userId, notification);
+
+    // Викликаємо Pusher для надсилання повідомлення
+    await this.pusherService.trigger('notifications-channel', 'new-notification', notification);
+
+    return { message: 'Notification sent and saved successfully' };
+  }
+
+  async getUserNotifications(userId: string) {
+    const user = await this.userService.getUserById(userId);
+    return user.notifications;
+  }
 }

@@ -21,7 +21,7 @@ export class User {
   @Prop()
   otpSecret?: string;
 
-  @Prop({ type: Date }) // Явно вказуємо тип Date
+  @Prop({ type: Date })
   otpExpires?: Date;
 
   @Prop()
@@ -41,6 +41,23 @@ export class User {
 
   @Prop()
   googleTokenExpiryDate?: Date;
+
+  @Prop({ type: [{ 
+    message: { 
+      title: String, 
+      startTime: Date, 
+      endTime: Date 
+    }, 
+    organizer: String 
+  }], default: [] })
+  notifications: {
+    message: {
+      title: string;
+      startTime: Date;
+      endTime: Date;
+    };
+    organizer: string;
+  }[];
 
   _id: string;
 }

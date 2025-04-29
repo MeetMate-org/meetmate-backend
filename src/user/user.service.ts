@@ -8,6 +8,7 @@ import * as bcryptjs from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
 import * as nodemailer from 'nodemailer';
 import * as speakeasy from 'speakeasy';
+import { IUser } from 'src/interfaces/iuser';
 
 @Injectable()
 export class UserService {
@@ -164,6 +165,14 @@ export class UserService {
       avatar: user.avatar,
       createdAt: user.createdAt
     };
+  }
+
+  async getAccount(userId: string): Promise<IUser> {
+    const user = await this.userModel.findById(userId).lean().exec();
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+    return user;
   }
 
   async getUserIdByAccessKey(accessKey: string): Promise<string | null> {

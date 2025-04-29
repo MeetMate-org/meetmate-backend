@@ -175,7 +175,7 @@ export class MeetingsService {
   }
 
   async getUserNotifications(userId: string) {
-    const user = await this.userService.getUserById(userId);
+    const user = await this.userService.getAccount(userId);
     return user.notifications;
   }
 }

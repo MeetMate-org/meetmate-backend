@@ -120,6 +120,28 @@ export class UserController {
     return this.userService.getUserById(id);
   }
 
+  @Get("account")
+  @ApiResponse({ status: 200, description: 'User account found' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiBody({
+    type: Object,
+    examples: {
+      example1: {
+        summary: 'Example user account',
+        value: {
+          id: 'string',
+        },
+      },
+    },
+    description: 'User account properties',
+    required: true,
+  })
+  @UseGuards(JwtAuthGuard)
+  async getUserAccount(@Req() req) {
+    return this.userService.getAccount(req.user.userId);
+  }
+
   // Генерація нового `accessKey`
   @Post('generate-access-key')
   @UseGuards(JwtAuthGuard)

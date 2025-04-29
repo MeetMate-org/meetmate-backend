@@ -164,7 +164,7 @@ export class MeetingsService {
     const user = await this.userService.addNotification(userId, notification);
 
     // Викликаємо Pusher для надсилання повідомлення
-    await this.pusherService.trigger('notifications-channel', 'new-notification', notification);
+    await this.pusherService.trigger('meetmate-channel', 'new-notification', notification);
 
     return { message: 'Notification sent and saved successfully' };
   }

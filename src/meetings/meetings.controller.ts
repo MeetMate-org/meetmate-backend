@@ -1,5 +1,5 @@
 //meetings.controller.ts
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, UseGuards } from '@nestjs/common';
 import { MeetingsService } from './meetings.service';
 import { MeetingProps } from 'src/interfaces/meetingProps';
 import { JwtAuthGuard } from 'src/guards/jwt.auth.guard';
@@ -16,6 +16,20 @@ export class MeetingsController {
   @ApiResponse({ status: 404, description: 'Meeting not found' })
   async getMeetingById(@Param('id') id: string) {
     return this.meetingsService.getMeetingById(id);
+  }
+
+  @Get("user/all/:userId")
+  @ApiResponse({ status: 200, description: 'All meetings found' })
+  @ApiResponse({ status: 404, description: 'Meetings not found' })
+  @ApiHeader({
+    name: 'x-access-token',
+    description: 'JWT token for authentication',
+    required: true,
+    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+  })
+  @UseGuards(JwtAuthGuard)
+  async getAllMeetings(@Param('userId') userId: string) {
+    return this.meetingsService.getAllMeetings(userId);
   }
 
   @Get("user/:userId")
@@ -108,7 +122,7 @@ export class MeetingsController {
     return this.meetingsService.deleteMeeting(id);
   }
 
-  @Patch("/edit/:id")
+  @Put("/edit/:id")
   @UseGuards(JwtAuthGuard)
   @ApiResponse({ status: 200, description: 'Meeting updated' })
   @ApiResponse({ status: 404, description: 'Meeting not found' })

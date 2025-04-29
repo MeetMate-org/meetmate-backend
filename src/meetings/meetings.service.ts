@@ -25,6 +25,20 @@ export class MeetingsService {
     return meeting;
   }
 
+  async getAllMeetings(userId: string): Promise<Meeting[]> {
+    const user = await this.userModel.findById(userId).exec();
+
+    const meetings = await this.meetingModel.find({
+      // find meetings where the user is an organizer or participant
+      $or: [
+        { organizer: user?._id },
+        { participants: user?.email }
+      ]
+    });
+
+    return meetings;
+  }
+
   async getMeetingsByUserId(userId: string): Promise<Meeting[]> {
     const meetings = await this.meetingModel.find({
       organizer: userId

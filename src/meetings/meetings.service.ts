@@ -4,9 +4,9 @@ import { Meeting, MeetingDocument, MeetingPlainObject } from './meetings.schema'
 import { Model } from 'mongoose';
 import { CreateMeetingDto } from './dto/create-meeting.dto';
 import { UpdateMeetingDto } from './dto/update-meeting.dto';
-import { UserService } from 'src/user/user.service';
-import { PusherService } from 'src/pusher/pusher.service';
-import { User, UserDocument } from 'src/user/user.schema';
+import { UserService } from '../user/user.service';
+import { PusherService } from '../pusher/pusher.service';
+import { User, UserDocument } from '../user/user.schema';
 
 @Injectable()
 export class MeetingsService {

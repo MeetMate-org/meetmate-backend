@@ -1,7 +1,7 @@
 //user.service.ts
 import { Controller, Post, Body, Get, Param, UseGuards, Req, Delete, Put } from '@nestjs/common';
 import { UserService } from './user.service';
-import { JwtAuthGuard } from 'src/guards/jwt.auth.guard';
+import { JwtAuthGuard } from '../guards/jwt.auth.guard';
 import { ApiBody, ApiResponse } from '@nestjs/swagger';
 
 @Controller('user')

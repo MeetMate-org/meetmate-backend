@@ -6,11 +6,6 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.enableCors({
-    origin: [process.env.URL_DEV, process.env.URL_PROD],
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-    credentials: true,
-  });
 
   // Налаштування Swagger
   const config = new DocumentBuilder()
@@ -31,6 +26,13 @@ async function bootstrap() {
     `../.env.${process.env.NODE_ENV || 'development'}`
   );
   require('dotenv').config({ path: envPath });
+
+
+  app.enableCors({
+    origin: [process.env.URL_DEV, process.env.URL_PROD],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    credentials: true,
+  });
 
   await app.listen(process.env.PORT ?? 3000);
 }

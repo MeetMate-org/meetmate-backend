@@ -29,10 +29,8 @@ async function bootstrap() {
 
 
   app.enableCors({
-    // enable CORS for URL_DEV, URL_PROD
     origin: [
-      process.env.URL_DEV,
-      process.env.URL_PROD,
+      process.env.URL_FRONTEND,
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     credentials: true,

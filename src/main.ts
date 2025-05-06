@@ -7,6 +7,12 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  const envPath = path.resolve(
+    __dirname,
+    `../.env.${process.env.NODE_ENV || 'development'}`
+  );
+  require('dotenv').config({ path: envPath });
+
   // Налаштування Swagger
   const config = new DocumentBuilder()
     .setTitle('MeetMate API')
@@ -20,12 +26,6 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
-
-  const envPath = path.resolve(
-    __dirname,
-    `../.env.${process.env.NODE_ENV || 'development'}`
-  );
-  require('dotenv').config({ path: envPath });
 
 
   app.enableCors({

@@ -185,22 +185,12 @@ export class MeetingsService {
         });
       }
   
-      // Зберігаємо повідомлення в новій моделі Notification
-      const notificationData = new Notification({
-        message: notification.message,
-        organizer: notification.organizer,
-        to: notification.to,
-      });
-      // await notificationData.save();
-  
       // Викликаємо Pusher для надсилання повідомлення
       const pusherData = {
         message: notification.message,
         organizer: notification.organizer,
         to: notification.to,
       };
-
-      console.log('Pusher data:', pusherData);
       
   
       const participants = notification.to.filter(email => email !== notification.organizer);

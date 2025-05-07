@@ -1,3 +1,4 @@
+//iuser.ts
 export interface IUser {
   username: string;
   email: string;

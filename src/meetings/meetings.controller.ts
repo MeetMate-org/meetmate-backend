@@ -167,7 +167,7 @@ export class MeetingsController {
     return this.meetingsService.voteMeeting(id, vote);
   }
 
-  @Post('notification/:userId')
+  @Post('notification')
   @UseGuards(JwtAuthGuard)
   @ApiResponse({ status: 201, description: 'Notification created and sent' })
   @ApiBody({
@@ -184,10 +184,9 @@ export class MeetingsController {
   })
   
   async createNotificationWithPusher(
-    @Param('userId') userId: string,
-    @Body() notification: { message: { title: string; startTime: Date; endTime: Date }; organizer: string }
+    @Body() notification: { to: string[]; message: { title: string; startTime: Date; endTime: Date }; organizer: string }
   ) {
-    return this.meetingsService.createNotificationWithPusher(userId, notification);
+    return this.meetingsService.createNotificationWithPusher(notification);
   }
 
   @Get('notifications/:userId')

@@ -45,7 +45,7 @@ async function bootstrap() {
 
   // Налаштування CORS
   app.enableCors({
-    origin: [process.env.URL_FRONTEND],
+    origin: process.env.URL_FRONTEND,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     credentials: true,
   });

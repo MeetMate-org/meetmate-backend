@@ -73,14 +73,15 @@ export class MeetingsController {
           title: 'Project Kickoff',
           description: 'Initial meeting to discuss project goals and timelines.',
           startTime: '2023-10-01T10:00:00Z',
-          endTime: '2023-10-01T11:00:00Z',
+          duration: 60,
           times: [
-            { value: '2023-10-01T10:00:00Z', votes: 5 },
-            { value: '2023-10-01T11:00:00Z', votes: 3 },
+            { value: '2023-10-01T10:00:00Z', votes: 0 },
+            { value: '2023-10-01T11:00:00Z', votes: 0 },
           ],
           createdAt: new Date().toISOString(),
-          organizer: 'John Doe',
-          participants: ['Alice', 'Bob'],
+          organizer: 'some_id',
+          organizerName: 'John Doe',
+          participants: ['alice@gmail.com', 'bob@gmail.com'],
         },
       },
     },
@@ -98,7 +99,6 @@ export class MeetingsController {
     const transformedMeetingProps = {
       ...meetingProps,
       startTime: new Date(meetingProps.startTime).toISOString(),
-      endTime: new Date(meetingProps.endTime).toISOString(),
       times: meetingProps.times.map((time) => ({
         value: new Date(time.value).toISOString(),
         votes: time.votes,
@@ -142,7 +142,6 @@ export class MeetingsController {
     const transformedMeetingProps = {
       ...meetingProps,
       startTime: new Date(meetingProps.startTime).toISOString(),
-      endTime: new Date(meetingProps.endTime).toISOString(),
     };
     return this.meetingsService.updateMeeting(id, transformedMeetingProps);
   }
@@ -176,15 +175,15 @@ export class MeetingsController {
         message: {
           title: 'Daily meeting',
           startTime: '2025-04-28T10:00:00Z',
-          endTime: '2025-04-28T11:00:00Z',
+          duration: 60,
         },
-        organizer: 'organizerId',
+        organizer: 'organizerName',
       },
     },
   })
   
   async createNotificationWithPusher(
-    @Body() notification: { to: string[]; message: { title: string; startTime: Date; endTime: Date }; organizer: string }
+    @Body() notification: { to: string[]; message: { title: string; startTime: Date; duration: number }; organizer: string }
   ) {
     return this.meetingsService.createNotificationWithPusher(notification);
   }

@@ -75,7 +75,6 @@ export class MeetingsService {
     const meetingData = {
       ...createMeetingDto,
       startTime: new Date(createMeetingDto.startTime),
-      endTime: new Date(createMeetingDto.endTime),
       times: createMeetingDto.times.map((time) => ({
         ...time,
         value: new Date(time.value),
@@ -108,7 +107,6 @@ export class MeetingsService {
       ...existingMeeting,
       ...updateMeetingDto,
       startTime: updateMeetingDto.startTime ? new Date(updateMeetingDto.startTime) : existingMeeting.startTime,
-      endTime: updateMeetingDto.endTime ? new Date(updateMeetingDto.endTime) : existingMeeting.endTime,
       _id: existingMeeting._id, 
     };
   
@@ -162,7 +160,7 @@ export class MeetingsService {
   async createNotificationWithPusher(
     notification: { 
       to: string[];
-      message: { title: string; startTime: Date; endTime: Date }; 
+      message: { title: string; startTime: Date; duration: number }; 
       organizer: string; 
     }
   ) {

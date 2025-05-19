@@ -279,7 +279,7 @@ export class UserService {
     return user;
   }
 
-  async addNotification(userId: string, notification: { message: { title: string; startTime: Date; endTime: Date }; organizer: string }) {
+  async addNotification(userId: string, notification: { message: { title: string; startTime: Date; duration: number }; organizer: string }) {
     const user = await this.userModel.findByIdAndUpdate(
       userId,
       { $push: { notifications: notification } },

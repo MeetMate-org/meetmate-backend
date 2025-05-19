@@ -33,7 +33,6 @@ export class GoogleCalendarService {
     const event: calendar_v3.Schema$Event = {
       summary: createEventDto.title,
       start: { dateTime: createEventDto.startTime, timeZone: 'UTC' },
-      end: { dateTime: createEventDto.endTime, timeZone: 'UTC' },
       location: createEventDto.location,
       description: createEventDto.description,
       attendees: createEventDto.attendees?.map((email) => ({ email })) || [],
@@ -67,7 +66,6 @@ export class GoogleCalendarService {
     const event: calendar_v3.Schema$Event = {
         summary: updateEventDto.title,
         start: updateEventDto.startTime ? { dateTime: updateEventDto.startTime, timeZone: 'UTC' } : undefined,
-        end: updateEventDto.endTime ? { dateTime: updateEventDto.endTime, timeZone: 'UTC' } : undefined,
         location: updateEventDto.location,
         description: updateEventDto.description,
         attendees: updateEventDto.attendees?.map((email) => ({ email })) || [],

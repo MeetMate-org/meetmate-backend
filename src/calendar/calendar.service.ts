@@ -31,6 +31,12 @@ export class CalendarService {
     return this.googleCalendarService.deleteEvent(eventId, user);
   }
 
+  // Оновлений метод
+  async getEventsByPeriod(user: User, from: string, to: string): Promise<GoogleEventDto[]> {
+    this.logger.log(`Fetching events for user ${user._id} from ${from} to ${to}`);
+    return this.googleCalendarService.getEventsByPeriod(user, from, to);
+  }
+
   async getEvents(user: User): Promise<GoogleEventDto[]> {
     this.logger.log(`Fetching events for user ${user._id}`);
     return this.googleCalendarService.getEvents(user);

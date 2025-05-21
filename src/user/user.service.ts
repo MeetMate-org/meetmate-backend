@@ -68,7 +68,7 @@ export class UserService {
       text: `Your OTP is ${otpToken}. It will expire in 10 minutes.`,
     });
 
-    const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET!, { expiresIn: '48h' });
+    const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET!, { expiresIn: '15m' });
 
     return { message: 'OTP sent to your email', userId: newUser._id, token, accessKey };
   }
@@ -124,8 +124,29 @@ export class UserService {
       throw new Error('Invalid username/email or password');
     }
 
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET!, { expiresIn: '48h' });
-    return { token, userId: user._id };
+    const accessToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET!, { expiresIn: '15m' });
+    const refreshToken = crypto.randomBytes(64).toString('hex');
+
+    user.refreshToken = refreshToken;
+    await user.save();
+
+    return { accessToken, refreshToken, userId: user._id };
+  }
+
+  // Реалізація логіки оновлення токенів
+  async refreshTokens(refreshToken: string) {
+    const user = await this.userModel.findOne({ refreshToken });
+    if (!user) {
+      throw new Error('Invalid refresh token');
+    }
+
+    const accessToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET!, { expiresIn: '15m' });
+    const newRefreshToken = crypto.randomBytes(64).toString('hex');
+
+    user.refreshToken = newRefreshToken;
+    await user.save();
+
+    return { accessToken, refreshToken: newRefreshToken };
   }
 
   async editUser(userId: string, updateProps: { username?: string; email?: string; password?: string }) {

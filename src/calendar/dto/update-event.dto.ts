@@ -24,9 +24,10 @@ export class UpdateEventDto {
 
   @IsOptional()
   @IsArray()
+  @IsString({ each: true })
   attendees?: string[];
 
   @IsOptional()
   @IsString()
-  creatorMeetMateId: string; 
+  creatorMeetMateId?: string;
 }

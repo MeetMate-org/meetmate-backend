@@ -11,8 +11,7 @@ export class UpdateEventDto {
   startTime?: string;
 
   @IsOptional()
-  @IsDateString()
-  endTime?: string;
+  duration: number;
 
   @IsOptional()
   @IsString()

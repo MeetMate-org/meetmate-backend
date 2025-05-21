@@ -33,7 +33,6 @@ export class GoogleCalendarService {
     const event: calendar_v3.Schema$Event = {
       summary: createEventDto.title,
       start: { dateTime: createEventDto.startTime, timeZone: 'UTC' },
-      end: { dateTime: createEventDto.endTime, timeZone: 'UTC' },
       location: createEventDto.location,
       description: createEventDto.description,
       attendees: createEventDto.attendees?.map((email) => ({ email })) || [],

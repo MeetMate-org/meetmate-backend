@@ -20,7 +20,9 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
       load: [configuration],
       envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
     }),
-    MongooseModule.forRoot(process.env.MONGO_URI || ''),
+    MongooseModule.forRoot(process.env.MONGO_URI || '', {
+      serverSelectionTimeoutMS: 100000, // Тайм-аут для підключення
+    }),
     UserModule,
     MeetingsModule,
     CalendarModule,

@@ -13,9 +13,8 @@ export class CreateMeetingDto {
   @IsNotEmpty()
   startTime: string; 
 
-  @IsDateString()
   @IsNotEmpty()
-  endTime: string;
+  duration: number;
 
   @IsString({ each: true })
   @IsNotEmpty({ each: true })
@@ -27,6 +26,10 @@ export class CreateMeetingDto {
   @IsString()
   @IsNotEmpty()
   organizer: string;
+
+  @IsString()
+  @IsNotEmpty()
+  organizerName: string;
 
   @IsString()
   @IsNotEmpty()

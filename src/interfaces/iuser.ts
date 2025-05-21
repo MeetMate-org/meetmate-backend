@@ -1,3 +1,4 @@
+//iuser.ts
 export interface IUser {
   username: string;
   email: string;
@@ -14,7 +15,7 @@ export interface IUser {
     message: {
       title: string;
       startTime: Date;
-      endTime: Date;
+      duration: number;
     };
     organizer: string;
   }[];

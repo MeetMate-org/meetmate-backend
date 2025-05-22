@@ -1,6 +1,6 @@
 //google-event.dto.ts
-import { IsString, IsOptional } from 'class-validator';
-import { ObjectType, Field } from '@nestjs/graphql';
+import { IsString, IsOptional, IsInt } from 'class-validator';
+import { ObjectType, Field, Int } from '@nestjs/graphql';
 
 @ObjectType('Event')
 export class GoogleEventDto {
@@ -20,9 +20,9 @@ export class GoogleEventDto {
   @IsString()
   start: string;
 
-  @Field()
-  @IsString()
-  end: string;
+  @Field(() => Int)
+  @IsInt()
+  duration: number;
 
   @Field(() => String, { nullable: true })
   @IsOptional()

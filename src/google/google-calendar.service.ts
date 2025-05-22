@@ -61,7 +61,7 @@ export class GoogleCalendarService {
       eventId,
     });
 
-    const existingExtendedProperties = currentEvent.data.extendedProperties?.private ?? {};
+    const existingExtendedProperties = currentEvent.data.extendedProperties?.private || {};
 
     const event: calendar_v3.Schema$Event = {
       summary: updateEventDto.title,
@@ -97,6 +97,14 @@ export class GoogleCalendarService {
     return { message: 'Event successfully deleted' };
   }
 
+  private calcDurationMinutes(start: string, end: string): number {
+    if (!start || !end) return 0;
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+    const diffMs = endDate.getTime() - startDate.getTime();
+    return Math.round(diffMs / 60000);
+  }
+
   async getEvents(user: User): Promise<GoogleEventDto[]> {
     const calendar = await this.getAuthenticatedClient(user);
 
@@ -114,20 +122,23 @@ export class GoogleCalendarService {
 
     const allEvents = response.data.items || [];
 
-    return allEvents.map((event) => ({
-      id: event.id!,
-      summary: event.summary || '',
-      description: event.description || '',
-      start: event.start?.dateTime || event.start?.date || '',
-      end: event.end?.dateTime || event.end?.date || '',
-      attendees: event.attendees || [],
-      hangoutLink: event.hangoutLink,
-      isMeetMateEvent: Boolean(event.extendedProperties?.private?.creatorMeetMateId),
-      creatorMeetMateId: event.extendedProperties?.private?.creatorMeetMateId || '',
-    }));
+    return allEvents.map((event) => {
+      const startStr = event.start?.dateTime || event.start?.date || '';
+      const endStr = event.end?.dateTime || event.end?.date || '';
+      const duration = this.calcDurationMinutes(startStr, endStr);
+
+      return {
+        id: event.id!,
+        summary: event.summary || '',
+        description: event.description || '',
+        start: startStr,
+        duration,
+        hangoutLink: event.hangoutLink,
+        creatorMeetMateId: event.extendedProperties?.private?.creatorMeetMateId || '',
+      };
+    });
   }
 
-  // Додаємо цей метод для GraphQL
   async getEventsByPeriod(user: User, from: string, to: string): Promise<GoogleEventDto[]> {
     const calendar = await this.getAuthenticatedClient(user);
 
@@ -141,16 +152,20 @@ export class GoogleCalendarService {
 
     const allEvents = response.data.items || [];
 
-    return allEvents.map((event) => ({
-      id: event.id!,
-      summary: event.summary || '',
-      description: event.description || '',
-      start: event.start?.dateTime || event.start?.date || '',
-      end: event.end?.dateTime || event.end?.date || '',
-      attendees: event.attendees || [],
-      hangoutLink: event.hangoutLink,
-      isMeetMateEvent: Boolean(event.extendedProperties?.private?.creatorMeetMateId),
-      creatorMeetMateId: event.extendedProperties?.private?.creatorMeetMateId || '',
-    }));
+    return allEvents.map((event) => {
+      const startStr = event.start?.dateTime || event.start?.date || '';
+      const endStr = event.end?.dateTime || event.end?.date || '';
+      const duration = this.calcDurationMinutes(startStr, endStr);
+
+      return {
+        id: event.id!,
+        summary: event.summary || '',
+        description: event.description || '',
+        start: startStr,
+        duration,
+        hangoutLink: event.hangoutLink,
+        creatorMeetMateId: event.extendedProperties?.private?.creatorMeetMateId || '',
+      };
+    });
   }
 }

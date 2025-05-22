@@ -191,7 +191,14 @@ export class UserService {
     return { message: 'New OTP sent to your email' };
   }
 
-  async getUserById(userId: string): Promise<{ username: string; email: string; avatar: string | undefined; createdAt: Date }> {
+  async getUserById(userId: string): Promise<{ username: string; email: string; avatar: string | undefined; createdAt: Date, notifications: {
+    message: {
+      title: string;
+      startTime: Date;
+      duration: number;
+    };
+    organizer: string;
+  }[]}> {
     const user = await this.userModel.findById(userId).lean().exec();
 
     if (!user) {
@@ -202,7 +209,8 @@ export class UserService {
       username: user.username,
       email: user.email,
       avatar: user.avatar,
-      createdAt: user.createdAt
+      createdAt: user.createdAt,
+      notifications: user.notifications,
     };
   }
 

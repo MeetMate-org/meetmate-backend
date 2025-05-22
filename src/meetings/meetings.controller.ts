@@ -79,7 +79,7 @@ export class MeetingsController {
             { value: '2023-10-01T11:00:00Z', votes: 0 },
           ],
           createdAt: new Date().toISOString(),
-          organizer: 'some_id',
+          organizer: 'some_name',
           organizerName: 'John Doe',
           participants: ['alice@gmail.com', 'bob@gmail.com'],
         },

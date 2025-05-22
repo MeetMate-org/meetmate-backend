@@ -83,6 +83,19 @@ export class MeetingsService {
     
     
     const createdMeeting = new this.meetingModel(meetingData);
+
+    // send notifications to participants
+    const notification = {
+      to: createMeetingDto.participants,
+      message: {
+        title: createMeetingDto.title,
+        startTime: new Date(createMeetingDto.startTime),
+        duration: createMeetingDto.duration,
+      },
+      organizer: createMeetingDto.organizerName,
+    };
+    await this.createNotificationWithPusher(notification);
+    
     return createdMeeting.save();
   }
   
@@ -165,7 +178,6 @@ export class MeetingsService {
     }
   ) {
     try {
-      // Перевірка наявності користувачів
       const users = await this.userModel.find({ email: { $in: notification.to } });
       if (!users || users.length === 0) {
         throw new NotFoundException('No users found for the provided emails');

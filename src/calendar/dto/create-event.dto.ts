@@ -11,19 +11,16 @@ export class CreateEventDto {
   @IsDateString()
   endTime: string;
 
-  @IsOptional()
   @IsString()
-  location?: string;
+  location: string;
 
-  @IsOptional()
   @IsString()
-  description?: string;
+  description: string;
 
   @IsArray()
-  @IsString({ each: true })
   attendees: string[];
 
   @IsOptional()
   @IsString()
-  creatorMeetMateId?: string;
+  creatorMeetMateId: string;
 }

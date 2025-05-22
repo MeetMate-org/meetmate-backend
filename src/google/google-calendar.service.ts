@@ -123,15 +123,15 @@ export class GoogleCalendarService {
     const allEvents = response.data.items || [];
 
     return allEvents.map((event) => {
-      const startStr = event.start?.dateTime || event.start?.date || '';
+      const startTime = event.start?.dateTime || event.start?.date || '';
       const endStr = event.end?.dateTime || event.end?.date || '';
-      const duration = this.calcDurationMinutes(startStr, endStr);
+      const duration = this.calcDurationMinutes(startTime, endStr);
 
       return {
         id: event.id!,
         summary: event.summary || '',
         description: event.description || '',
-        start: startStr,
+        startTime,
         duration,
         hangoutLink: event.hangoutLink,
         creatorMeetMateId: event.extendedProperties?.private?.creatorMeetMateId || '',
@@ -153,15 +153,15 @@ export class GoogleCalendarService {
     const allEvents = response.data.items || [];
 
     return allEvents.map((event) => {
-      const startStr = event.start?.dateTime || event.start?.date || '';
+      const startTime = event.start?.dateTime || event.start?.date || '';
       const endStr = event.end?.dateTime || event.end?.date || '';
-      const duration = this.calcDurationMinutes(startStr, endStr);
+      const duration = this.calcDurationMinutes(startTime, endStr);
 
       return {
         id: event.id!,
         summary: event.summary || '',
         description: event.description || '',
-        start: startStr,
+        startTime,
         duration,
         hangoutLink: event.hangoutLink,
         creatorMeetMateId: event.extendedProperties?.private?.creatorMeetMateId || '',

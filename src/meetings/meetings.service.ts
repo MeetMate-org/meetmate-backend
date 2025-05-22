@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Meeting, MeetingDocument, MeetingPlainObject } from './meetings.schema';
 import { Model } from 'mongoose';
@@ -7,6 +7,7 @@ import { UpdateMeetingDto } from './dto/update-meeting.dto';
 import { UserService } from '../user/user.service';
 import { PusherService } from '../pusher/pusher.service';
 import { User, UserDocument } from '../user/user.schema';
+import { Notification } from '../notifications/notification.schema';
 
 @Injectable()
 export class MeetingsService {
@@ -74,7 +75,6 @@ export class MeetingsService {
     const meetingData = {
       ...createMeetingDto,
       startTime: new Date(createMeetingDto.startTime),
-      endTime: new Date(createMeetingDto.endTime),
       times: createMeetingDto.times.map((time) => ({
         ...time,
         value: new Date(time.value),
@@ -107,7 +107,6 @@ export class MeetingsService {
       ...existingMeeting,
       ...updateMeetingDto,
       startTime: updateMeetingDto.startTime ? new Date(updateMeetingDto.startTime) : existingMeeting.startTime,
-      endTime: updateMeetingDto.endTime ? new Date(updateMeetingDto.endTime) : existingMeeting.endTime,
       _id: existingMeeting._id, 
     };
   
@@ -159,19 +158,55 @@ export class MeetingsService {
   }
 
   async createNotificationWithPusher(
-    userId: string, 
     notification: { 
-      message: { title: string; startTime: Date; endTime: Date }; 
+      to: string[];
+      message: { title: string; startTime: Date; duration: number }; 
       organizer: string; 
     }
   ) {
-    // Оновлюємо користувача в базі даних
-    const user = await this.userService.addNotification(userId, notification);
-
-    // Викликаємо Pusher для надсилання повідомлення
-    await this.pusherService.trigger('meetmate-channel', 'new-notification', notification);
-
-    return { message: 'Notification sent and saved successfully' };
+    try {
+      // Перевірка наявності користувачів
+      const users = await this.userModel.find({ email: { $in: notification.to } });
+      if (!users || users.length === 0) {
+        throw new NotFoundException('No users found for the provided emails');
+      }
+  
+      if (!notification.organizer) {
+        throw new BadRequestException('Organizer email is required');
+      }
+  
+      // Додаємо повідомлення до кожного користувача
+      for (const user of users) {
+        await this.userService.addNotification(user._id.toString(), {
+          message: notification.message,
+          organizer: notification.organizer,
+        });
+      }
+  
+      // Викликаємо Pusher для надсилання повідомлення
+      const pusherData = {
+        message: notification.message,
+        organizer: notification.organizer,
+        to: notification.to,
+      };
+      
+  
+      const participants = notification.to.filter(email => email !== notification.organizer);
+      for (const participant of participants) {
+        console.log('Triggering Pusher for participant:', participant);
+        
+        await this.pusherService.trigger(
+          "meetmate-channel",
+          participant,
+          pusherData,
+        );
+      }
+  
+      return { message: 'Notification sent and saved successfully' };
+    } catch (error) {
+      console.error('Error creating notification:', error);
+      throw new BadRequestException('Failed to create notification');
+    }
   }
 
   async getUserNotifications(userId: string) {

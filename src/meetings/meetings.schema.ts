@@ -15,13 +15,16 @@ export class Meeting {
   startTime: Date;
 
   @Prop({ required: true })
-  endTime: Date;
+  duration: number;
 
   @Prop({ required: true })
   participants: string[];
 
   @Prop({ required: true })
   organizer: string;
+
+  @Prop({ required: true })
+  organizerName: string;
 
   @Prop({ required: true })
   createdAt: Date;

@@ -18,7 +18,7 @@ export class GoogleEventDto {
 
   @Field()
   @IsString()
-  start: string;
+  startTime: string; // ВИПРАВЛЕНО!
 
   @Field(() => Int)
   @IsInt()

@@ -49,7 +49,7 @@ export class User {
     message: { 
       title: String, 
       startTime: Date, 
-      endTime: Date 
+      duration: Number 
     }, 
     organizer: String 
   }], default: [] })
@@ -57,7 +57,7 @@ export class User {
     message: {
       title: string;
       startTime: Date;
-      endTime: Date;
+      duration: number;
     };
     organizer: string;
   }[];

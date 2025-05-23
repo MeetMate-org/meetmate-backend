@@ -11,6 +11,8 @@ import { MeetingsModule } from './meetings/meetings.module';
 import { CalendarModule } from './calendar/calendar.module';
 import { GoogleModule } from './google/google.module';
 import { PusherService } from './pusher/pusher.service';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 
 @Module({
   imports: [
@@ -25,6 +27,12 @@ import { PusherService } from './pusher/pusher.service';
     MeetingsModule,
     CalendarModule,
     GoogleModule,
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      autoSchemaFile: true,
+      playground: true,
+      context: ({ req }) => ({ req }),
+    }),
   ],
   controllers: [AppController],
   providers: [AppService, PusherService],

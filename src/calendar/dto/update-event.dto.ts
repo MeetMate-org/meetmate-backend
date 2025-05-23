@@ -11,7 +11,8 @@ export class UpdateEventDto {
   startTime?: string;
 
   @IsOptional()
-  duration: number;
+  @IsDateString()
+  endTime?: string;
 
   @IsOptional()
   @IsString()
@@ -23,9 +24,10 @@ export class UpdateEventDto {
 
   @IsOptional()
   @IsArray()
+  @IsString({ each: true })
   attendees?: string[];
 
   @IsOptional()
   @IsString()
-  creatorMeetMateId: string; 
+  creatorMeetMateId?: string;
 }

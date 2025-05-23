@@ -4,10 +4,11 @@ import { CalendarController } from './calendar.controller';
 import { CalendarService } from './calendar.service';
 import { UserModule } from '../user/user.module';
 import { GoogleModule } from '../google/google.module';
+import { CalendarResolver } from './calendar.resolver';
 
 @Module({
   imports: [UserModule, GoogleModule],
   controllers: [CalendarController],
-  providers: [CalendarService],
+  providers: [CalendarService, CalendarResolver],
 })
 export class CalendarModule {}

@@ -125,13 +125,12 @@ export class UserController {
     return this.userService.login(userProps);
   }
 
-      // Додати новий ендпоінт для оновлення токенів
-      @Post('refresh-tokens')
-      @ApiResponse({ status: 200, description: 'Tokens refreshed successfully' })
-      @ApiResponse({ status: 400, description: 'Bad request' })
-      async refreshTokens(@Body() body: { refreshToken: string }) {
-          return this.userService.refreshTokens(body.refreshToken);
-      }
+  @Post('refresh-tokens')
+  @ApiResponse({ status: 200, description: 'Tokens refreshed successfully' })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  async refreshTokens(@Body() body: { refreshToken: string }) {
+      return this.userService.refreshTokens(body.refreshToken);
+  }
 
   // Отримання інформації про користувача за ID
   @Get(':id')

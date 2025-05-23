@@ -8,8 +8,8 @@ export class CreateEventDto {
   @IsDateString()
   startTime: string;
 
-  @IsString()
-  duration: number;
+  @IsDateString()
+  endTime: string;
 
   @IsString()
   location: string;

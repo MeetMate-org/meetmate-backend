@@ -6,10 +6,14 @@ import { CreateEventDto } from '../calendar/dto/create-event.dto';
 import { UpdateEventDto } from '../calendar/dto/update-event.dto';
 import { User } from '../user/user.schema';
 import { GoogleEventDto } from '../calendar/dto/google-event.dto';
+import { RedisService } from '../redis/redis.service';
 
 @Injectable()
 export class GoogleCalendarService {
-  constructor(private readonly googleAuthService: GoogleAuthService) {}
+  constructor(
+    private readonly googleAuthService: GoogleAuthService,
+    private readonly redisService: RedisService,
+  ) {}
 
   private async getAuthenticatedClient(user: User): Promise<calendar_v3.Calendar> {
     const accessToken = await this.googleAuthService.getValidAccessToken(user);
@@ -25,6 +29,13 @@ export class GoogleCalendarService {
       eventId,
     });
     return event.data;
+  }
+
+  private getEventsCacheKey(userId: string, from?: string, to?: string): string {
+    if (from && to) {
+      return `events:${userId}:${from}:${to}`;
+    }
+    return `events:${userId}:all`;
   }
 
   async createEvent(createEventDto: CreateEventDto, user: User) {
@@ -50,6 +61,8 @@ export class GoogleCalendarService {
       requestBody: event,
     });
 
+    // Invalidate all event cache for this user
+    await this.redisService.del(this.getEventsCacheKey(user._id.toString()));
     return createdEvent.data;
   }
 
@@ -85,6 +98,8 @@ export class GoogleCalendarService {
       requestBody: event,
     });
 
+    // Invalidate all event cache for this user
+    await this.redisService.del(this.getEventsCacheKey(user._id.toString()));
     return updatedEvent.data;
   }
 
@@ -94,6 +109,8 @@ export class GoogleCalendarService {
       calendarId: 'primary',
       eventId,
     });
+    // Invalidate all event cache for this user
+    await this.redisService.del(this.getEventsCacheKey(user._id.toString()));
     return { message: 'Event successfully deleted' };
   }
 
@@ -106,6 +123,12 @@ export class GoogleCalendarService {
   }
 
   async getEvents(user: User): Promise<GoogleEventDto[]> {
+    const key = this.getEventsCacheKey(user._id.toString());
+    // 1. Try to get from cache
+    const cached = await this.redisService.get<GoogleEventDto[]>(key);
+    if (cached) return cached;
+
+    // 2. If not, get from Google
     const calendar = await this.getAuthenticatedClient(user);
 
     const now = new Date();
@@ -121,8 +144,7 @@ export class GoogleCalendarService {
     });
 
     const allEvents = response.data.items || [];
-
-    return allEvents.map((event) => {
+    const result = allEvents.map((event) => {
       const startTime = event.start?.dateTime || event.start?.date || '';
       const endStr = event.end?.dateTime || event.end?.date || '';
       const duration = this.calcDurationMinutes(startTime, endStr);
@@ -137,9 +159,18 @@ export class GoogleCalendarService {
         creatorMeetMateId: event.extendedProperties?.private?.creatorMeetMateId || '',
       };
     });
+
+    // 3. Put to cache for 60 seconds
+    await this.redisService.set(key, result, 60);
+
+    return result;
   }
 
   async getEventsByPeriod(user: User, from: string, to: string): Promise<GoogleEventDto[]> {
+    const key = this.getEventsCacheKey(user._id.toString(), from, to);
+    const cached = await this.redisService.get<GoogleEventDto[]>(key);
+    if (cached) return cached;
+
     const calendar = await this.getAuthenticatedClient(user);
 
     const response = await calendar.events.list({
@@ -152,7 +183,7 @@ export class GoogleCalendarService {
 
     const allEvents = response.data.items || [];
 
-    return allEvents.map((event) => {
+    const result = allEvents.map((event) => {
       const startTime = event.start?.dateTime || event.start?.date || '';
       const endStr = event.end?.dateTime || event.end?.date || '';
       const duration = this.calcDurationMinutes(startTime, endStr);
@@ -167,5 +198,10 @@ export class GoogleCalendarService {
         creatorMeetMateId: event.extendedProperties?.private?.creatorMeetMateId || '',
       };
     });
+
+    // Cache for 60 seconds
+    await this.redisService.set(key, result, 60);
+
+    return result;
   }
 }

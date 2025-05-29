@@ -13,6 +13,7 @@ import { GoogleModule } from './google/google.module';
 import { PusherService } from './pusher/pusher.service';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
       playground: true,
       context: ({ req }) => ({ req }),
     }),
+    RedisModule,
   ],
   controllers: [AppController],
   providers: [AppService, PusherService],

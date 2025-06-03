@@ -3,6 +3,7 @@ import { Controller, Post, Body, Get, Param, UseGuards, Req, Delete, Put } from 
 import { UserService } from './user.service';
 import { JwtAuthGuard } from '../guards/jwt.auth.guard';
 import { ApiBody, ApiResponse } from '@nestjs/swagger';
+import { UpdateFreeTimeDto } from './dto/update-free-time.dto';
 
 @Controller('user')
 export class UserController {
@@ -198,5 +199,33 @@ export class UserController {
   async deleteGoogleTokens(@Req() req) {
     const userId = req.user.userId;
     return this.userService.deleteGoogleTokens(userId);
+  }
+
+  @Put('free-time')
+  @UseGuards(JwtAuthGuard)
+  @ApiBody({
+    type: UpdateFreeTimeDto,
+    description: 'User free time by days',
+    required: true,
+    examples: {
+      example1: {
+        summary: 'Set free time',
+        value: {
+          freeTime: {
+            mon: [{ start: '09:00', end: '18:00' }],
+            tue: [{ start: '10:00', end: '16:00' }],
+            wed: [],
+            thu: [],
+            fri: [{ start: '11:00', end: '13:00' }, { start: '15:00', end: '17:00' }],
+            sat: [],
+            sun: []
+          }
+        }
+      }
+    }
+  })
+  async updateFreeTime(@Body() body: UpdateFreeTimeDto, @Req() req) {
+    const userId = req.user.userId;
+    return this.userService.updateFreeTime(userId, body.freeTime);
   }
 }

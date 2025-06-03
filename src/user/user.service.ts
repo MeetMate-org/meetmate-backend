@@ -300,4 +300,14 @@ export class UserService {
 
     return user;
   }
+
+  async updateFreeTime(userId: string, freeTime: { [day: string]: { start: string; end: string }[] }) {
+    const user = await this.userModel.findByIdAndUpdate(
+      userId,
+      { freeTime },
+      { new: true }
+    );
+    if (!user) throw new NotFoundException('User not found');
+    return { message: 'Free time updated', freeTime: user.freeTime };
+  }
 }

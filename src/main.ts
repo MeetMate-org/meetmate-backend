@@ -44,11 +44,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
 
   // Налаштування CORS
-  app.enableCors({
-    origin: process.env.URL_FRONTEND,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-    credentials: true,
-  });
+  app.enableCors();
 
   // Запуск серверу
   await app.listen(process.env.PORT ?? 3000);

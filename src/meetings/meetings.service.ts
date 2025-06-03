@@ -269,13 +269,9 @@ export class MeetingsService {
     return user.notifications;
   }
 
-  async getOptimalTime(meetingId: string): Promise<any> {
-    const meeting = await this.meetingModel.findById(meetingId).lean().exec();
-    if (!meeting) throw new NotFoundException('Meeting not found');
-
+  async getOptimalTime(emails: string[], organizerId: string ): Promise<any> {
     // 1. Збираємо всіх учасників (емейли) та організатора (id)
-    const participantsEmails: string[] = meeting.participants || [];
-    const organizerId: string = meeting.organizer;
+    const participantsEmails: string[] = emails;
 
     const organizer = await this.userModel.findById(organizerId).lean().exec();
     if (!organizer) throw new NotFoundException('Organizer not found');
@@ -338,7 +334,6 @@ export class MeetingsService {
     }
 
     return {
-      meetingId,
       participants: users.map(u => ({ id: u._id, email: u.email, username: u.username })),
       optimalTimeByDay: optimalByDay
     };

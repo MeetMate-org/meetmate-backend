@@ -2,6 +2,8 @@
 import { IsString } from 'class-validator';
 
 export class MeetingIdDto {
+  emails: string[];
+
   @IsString()
-  _id: string; // ID мітингу
+  organizerId: string
 }

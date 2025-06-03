@@ -203,11 +203,11 @@ export class MeetingsController {
     required: true,
     examples: {
       example1: {
-        value: { _id: '665d0c930f211b2e94b8cabc' }
+        value: { emails: ["alice@gmail.com", "yura@gmail.com"], organizerId: "some_id" }
       }
     }
   })
   async getOptimalTime(@Body() body: MeetingIdDto) {
-    return this.meetingsService.getOptimalTime(body._id);
+    return this.meetingsService.getOptimalTime(body.emails, body.organizerId);
   }
 }

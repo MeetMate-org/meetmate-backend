@@ -198,7 +198,7 @@ export class UserService {
       duration: number;
     };
     organizer: string;
-  }[]}> {
+  }[], freeTime: {[day: string]: { start: string; end: string }[]}}> {
     const user = await this.userModel.findById(userId).lean().exec();
 
     if (!user) {
@@ -211,6 +211,7 @@ export class UserService {
       avatar: user.avatar,
       createdAt: user.createdAt,
       notifications: user.notifications,
+      freeTime: user.freeTime
     };
   }
 

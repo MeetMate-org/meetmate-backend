@@ -6,6 +6,7 @@ import { JwtAuthGuard } from 'src/guards/jwt.auth.guard';
 import { ApiBody, ApiHeader, ApiResponse } from '@nestjs/swagger';
 import { CreateMeetingDto } from './dto/create-meeting.dto';
 import { UpdateMeetingDto } from './dto/update-meeting.dto';
+import { MeetingIdDto } from './dto/meeting-id.dto';
 
 @Controller('meetings')
 export class MeetingsController {
@@ -193,5 +194,20 @@ export class MeetingsController {
   @ApiResponse({ status: 200, description: 'User notifications retrieved' })
   async getUserNotifications(@Param('userId') userId: string) {
     return this.meetingsService.getUserNotifications(userId);
+  }
+
+  @Post('optimal-time')
+  @UseGuards(JwtAuthGuard)
+  @ApiBody({
+    type: MeetingIdDto,
+    required: true,
+    examples: {
+      example1: {
+        value: { _id: '665d0c930f211b2e94b8cabc' }
+      }
+    }
+  })
+  async getOptimalTime(@Body() body: MeetingIdDto) {
+    return this.meetingsService.getOptimalTime(body._id);
   }
 }

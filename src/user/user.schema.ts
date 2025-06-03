@@ -62,6 +62,22 @@ export class User {
     organizer: string;
   }[];
 
+  @Prop({
+    type: Object,
+    default: {
+      mon: [{ start: '09:00', end: '17:00' }],
+      tue: [{ start: '09:00', end: '17:00' }],
+      wed: [{ start: '09:00', end: '17:00' }],
+      thu: [{ start: '09:00', end: '17:00' }],
+      fri: [{ start: '09:00', end: '17:00' }],
+      sat: [],
+      sun: []
+    }
+  })
+  freeTime: {
+    [day: string]: { start: string; end: string }[];
+  };
+
   _id: string;
 }
 
